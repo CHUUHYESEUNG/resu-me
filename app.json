@@ -1,38 +1,55 @@
 {
   "expo": {
-    "name": "resu-me",
+    "name": "레쥬미 - 말하는 이력서",
     "slug": "resu-me",
     "version": "1.0.0",
-
+    "scheme": "resu-me",
     "web": {
       "favicon": "./assets/favicon.png"
     },
-
     "experiments": {
       "tsconfigPaths": true
     },
-
-    "plugins": [],
-
+    "plugins": [
+      "expo-router",
+      [
+        "expo-av",
+        {
+          "microphonePermission": "말하는 이력서를 작성하기 위해 마이크 권한이 필요합니다."
+        }
+      ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "음성으로 이력서를 작성하기 위해 마이크 권한이 필요합니다.",
+          "speechRecognitionPermission": "음성 인식 기능을 사용하기 위해 권한이 필요합니다."
+        }
+      ]
+    ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-
     "userInterfaceStyle": "light",
-
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2563EB"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.resume.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#2563EB"
+      },
+      "package": "com.resume.app",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     }
   }
 }
