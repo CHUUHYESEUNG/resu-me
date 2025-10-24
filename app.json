@@ -39,7 +39,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.resume.app"
+      "bundleIdentifier": "com.resume.app",
+      "newArchEnabled": false
     },
     "android": {
       "adaptiveIcon": {
