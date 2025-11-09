@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ActivityIndicator, Alert, Linking, Platform } from 'react-native';
 import { Colors, FontSizes, Spacing, BorderRadius } from '../constants/styles';
 import { speechRecognition } from '../utils/speechRecognition';
 
@@ -21,6 +21,14 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const openSettings = () => {
+    if (Platform.OS === 'ios') {
+      Linking.openURL('app-settings:');
+    } else {
+      Linking.openSettings();
+    }
+  };
+
   const startRecording = async () => {
     try {
       console.log('[VoiceInput] Starting recording...');
@@ -39,8 +47,22 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
         },
         (error) => {
           console.error('[VoiceInput] Speech error:', error);
-          Alert.alert('오류', '음성 인식에 실패했습니다.\n\n' + error.message);
-          stopRecording();
+          setIsRecording(false);
+          setIsProcessing(false);
+
+          // 권한 관련 에러인지 확인
+          if (error.message.includes('권한') || error.message.includes('permission')) {
+            Alert.alert(
+              '권한 필요',
+              '음성 인식을 사용하려면 마이크 및 음성 인식 권한이 필요합니다.\n\n설정에서 권한을 허용해주세요.',
+              [
+                { text: '취소', style: 'cancel' },
+                { text: '설정 열기', onPress: openSettings },
+              ]
+            );
+          } else {
+            Alert.alert('오류', '음성 인식에 실패했습니다.\n\n' + error.message);
+          }
         },
         {
           language: 'ko-KR',
@@ -52,9 +74,23 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
       setIsProcessing(false);
     } catch (error: any) {
       console.error('[VoiceInput] Start error:', error);
-      Alert.alert('오류', '음성 인식을 시작할 수 없습니다.\n\n' + (error.message || '알 수 없는 오류'));
       setIsRecording(false);
       setIsProcessing(false);
+
+      // 권한 관련 에러인지 확인
+      const errorMessage = error.message || '알 수 없는 오류';
+      if (errorMessage.includes('권한') || errorMessage.includes('permission')) {
+        Alert.alert(
+          '권한 필요',
+          '음성 인식을 사용하려면 마이크 및 음성 인식 권한이 필요합니다.\n\n설정 > 레쥬미에서 권한을 허용해주세요.',
+          [
+            { text: '취소', style: 'cancel' },
+            { text: '설정 열기', onPress: openSettings },
+          ]
+        );
+      } else {
+        Alert.alert('오류', '음성 인식을 시작할 수 없습니다.\n\n' + errorMessage);
+      }
     }
   };
 

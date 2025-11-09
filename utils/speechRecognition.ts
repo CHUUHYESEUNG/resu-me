@@ -53,11 +53,22 @@ class SpeechRecognitionHelper {
       // granted, denied 등 확인
       if (result.granted === true || result.status === 'granted') {
         console.log('[Speech] Permission granted!');
-        // iOS 권한 상태 업데이트 대기 (중요!) - 1초로 증가
-        console.log('[Speech] Waiting for permission state to update...');
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log('[Speech] Permission state updated');
-        return true;
+        // iOS 권한 팝업 후 앱 재개 대기 (중요!) - 2초로 증가
+        console.log('[Speech] Waiting for app to resume and permission state to update...');
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // 권한 상태 재확인 (iOS 권한 팝업 후 상태 동기화 확인)
+        console.log('[Speech] Double-checking permission state...');
+        const recheckResult = await ExpoSpeechRecognitionModule.getPermissionsAsync();
+        console.log('[Speech] Recheck result:', JSON.stringify(recheckResult));
+
+        if (recheckResult.granted === true || recheckResult.status === 'granted') {
+          console.log('[Speech] Permission state confirmed');
+          return true;
+        } else {
+          console.error('[Speech] Permission state mismatch after grant');
+          return false;
+        }
       }
 
       console.warn('[Speech] Permission denied or status:', result.status || result);
@@ -103,8 +114,9 @@ class SpeechRecognitionHelper {
       try {
       console.log('[Speech] Registering result listener...');
 
-      // 네이티브 모듈이 준비될 때까지 추가 대기
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // 네이티브 모듈이 준비될 때까지 추가 대기 (500ms로 증가)
+      console.log('[Speech] Waiting for native module to be ready...');
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       const resultSubscription = addSpeechRecognitionListener('result', (event) => {
         try {

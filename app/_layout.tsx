@@ -1,9 +1,3 @@
-import 'expo/build/Expo.fx';
-
-if (!(globalThis as any).expo) {
-  (globalThis as any).expo = {};
-}
-
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { ResumeProvider } from '../contexts/ResumeContext';
